@@ -1,0 +1,25 @@
+name: Update LeetCode stats
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch stats
+        run: |
+          curl -s https://leetcode.com/graphql \
+            -H 'Content-Type: application/json' -H 'Referer: https://leetcode.com' -H 'User-Agent: Mozilla/5.0' \
+            -d '{"query":"query($u:String!){userContestRanking(username:$u){rating topPercentage attendedContestsCount} matchedUser(username:$u){submitStats{acSubmissionNum{difficulty count}}}}","variables":{"u":"NamanSinha04"}}' > raw.json
+          jq -e '.data.matchedUser' raw.json > /dev/null || { echo "LeetCode returned no data, keeping the old file"; exit 0; }
+          jq '{updated:(now|todate), rating:((.data.userContestRanking.rating // 0)|floor), topPercentage:(.data.userContestRanking.topPercentage // null), contests:(.data.userContestRanking.attendedContestsCount // null), solved:(.data.matchedUser.submitStats.acSubmissionNum|map({(.difficulty|ascii_downcase):.count})|add)}' raw.json > data/leetcode.json
+          rm raw.json
+      - name: Commit if changed
+        run: |
+          git config user.name "portfolio-bot"; git config user.email "bot@users.noreply.github.com"
+          git add data/leetcode.json
+          git diff --cached --quiet || (git commit -m "Update LeetCode stats" && git push)
