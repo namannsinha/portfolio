@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio editor</title>
+<style>
+body{background:#111612;color:#EFEBDD;font:16px/1.5 system-ui,sans-serif;padding:24px;max-width:860px;margin:auto}
+h1{font-weight:500}fieldset{border:1px solid #2A332B;border-radius:4px;margin:0 0 18px;padding:16px;background:#182019}
+legend{color:#C9A24B;padding:0 8px}label{display:block;font-size:.8rem;color:#A3AA9C;margin:10px 0 3px}
+input,textarea,select{width:100%;box-sizing:border-box;background:#111612;color:#EFEBDD;border:1px solid #2A332B;border-radius:3px;padding:8px;font:inherit}
+textarea{min-height:64px}button{background:none;color:#EFEBDD;border:1px solid #EFEBDD;border-radius:3px;padding:8px 14px;cursor:pointer;margin:4px 6px 0 0;font:inherit}
+button.p{background:#C9A24B;border-color:#C9A24B;color:#17130A}button.on{border-color:#C9A24B;color:#C9A24B}.note{color:#A3AA9C;font-size:.9rem}
+</style></head><body>
+<h1>Portfolio editor</h1>
+<p class="note">Pick what to edit, change it, then press <b>Download</b> and replace the file of the same name in your GitHub repository. Nothing is saved until you do that.</p>
+<div><button id="tp">Projects</button><button id="ta">Beyond the code</button></div>
+<div style="margin-top:12px"><button class="p" id="add">Add</button><button class="p" id="dl">Download</button> <label style="display:inline">or open a file: <input type="file" id="open" accept=".json" style="width:auto"></label></div>
+<div id="list" style="margin-top:20px"></div>
+<script src="sims.js"></script>
+<script>
+var mode="projects",D={projects:{projects:[]},activities:{activities:[]}},list=document.getElementById("list"),FILE={projects:"projects.json",activities:"activities.json"};
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
+function arr(){return mode==="projects"?D.projects.projects:D.activities.activities}
+function field(i,l,k,p,ta,join){var v=join?(p[k]||[]).join(join==="\n"?"\n":", "):p[k];
+  return '<label>'+l+'</label>'+(ta?'<textarea data-i="'+i+'" data-f="'+k+'">'+esc(v)+'</textarea>':'<input data-i="'+i+'" data-f="'+k+'" value="'+esc(v)+'">')}
+function draw(){
+  document.getElementById("tp").className=mode==="projects"?"on":"";document.getElementById("ta").className=mode==="activities"?"on":"";
+  var sims='<option value="">No visual</option>'+Object.keys(SIMS).map(function(k){return '<option value="'+k+'">'+SIMS[k].label+'</option>'}).join("");
+  list.innerHTML=arr().map(function(p,i){
+    var body=mode==="projects"
+      ? field(i,"Title","title",p)+field(i,"What I did","did",p,1)+field(i,"The hard part","hard",p,1)+field(i,"Outcome (optional)","outcome",p,1)+field(i,"Tech tags, separated by commas","tags",p,0,",")+field(i,"Source code link","link",p)+field(i,"Live demo link (optional)","demo",p)+
+        '<label>Interactive visual</label><select data-i="'+i+'" data-f="sim">'+sims.replace('value="'+(p.sim||"")+'"','value="'+(p.sim||"")+'" selected')+'</select>'+field(i,"Or a screenshot path, e.g. images/my-project.png (used when no visual is chosen)","image",p)
+      : '<label>Category</label><select data-i="'+i+'" data-f="category">'+["Sports","CSR","Event management","Other"].map(function(c){return '<option'+(p.category===c?' selected':'')+'>'+c+'</option>'}).join("")+'</select>'+
+        field(i,"Title","title",p)+field(i,"Your role","role",p)+field(i,"When (for example March 2025)","when",p)+field(i,"What you did and the result","text",p,1)+field(i,"Photo paths, one per line (first is the main photo, e.g. images/fest-1.jpg)","images",p,1,"\n");
+    return '<fieldset><legend>'+(mode==="projects"?"Project ":"Activity ")+(i+1)+'</legend>'+body+'<div><button data-m="up" data-i="'+i+'">Move up</button><button data-m="down" data-i="'+i+'">Move down</button><button data-m="del" data-i="'+i+'">Delete</button></div></fieldset>'}).join("");
+}
+list.addEventListener("input",function(e){var t=e.target,i=t.dataset.i,k=t.dataset.f;if(i==null)return;
+  var v=t.value;if(k==="tags")v=v.split(",").map(function(s){return s.trim()}).filter(Boolean);if(k==="images")v=v.split("\n").map(function(s){return s.trim()}).filter(Boolean);arr()[i][k]=v});
+list.addEventListener("change",function(e){var t=e.target;if(t.tagName==="SELECT"&&t.dataset.i!=null)arr()[t.dataset.i][t.dataset.f]=t.value});
+list.addEventListener("click",function(e){var m=e.target.dataset.m,i=+e.target.dataset.i,a=arr();if(!m)return;
+  if(m==="del"&&confirm("Delete this entry?"))a.splice(i,1);
+  if(m==="up"&&i>0)a.splice(i-1,0,a.splice(i,1)[0]);
+  if(m==="down"&&i<a.length-1)a.splice(i+1,0,a.splice(i,1)[0]);draw()});
+function sw(m){mode=m;draw()}
+document.getElementById("tp").onclick=function(){sw("projects")};document.getElementById("ta").onclick=function(){sw("activities")};
+document.getElementById("add").onclick=function(){arr().push(mode==="projects"?{title:"New project",sim:"",did:"",hard:"",outcome:"",tags:[],link:"",demo:"",image:""}:{category:"Sports",title:"New activity",role:"",when:"",text:"",images:[]});draw();window.scrollTo(0,document.body.scrollHeight)};
+document.getElementById("dl").onclick=function(){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(D[mode],null,2)],{type:"application/json"}));a.download=FILE[mode];a.click()};
+document.getElementById("open").onchange=function(e){var r=new FileReader();r.onload=function(){D[mode]=JSON.parse(r.result);draw()};r.readAsText(e.target.files[0])};
+Promise.all(["projects","activities"].map(function(k){return fetch(FILE[k]).then(function(r){return r.json()}).then(function(d){D[k]=d}).catch(function(){})})).then(draw);
+</script></body></html>

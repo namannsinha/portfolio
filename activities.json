@@ -1,0 +1,28 @@
+{
+  "activities": [
+    {
+      "category": "Sports",
+      "title": "Annual Sports Fest, GLA University",
+      "role": "Participant & Coordination",
+      "when": "2025 & 2026",
+      "text": "• 2× 1st Place Champion – 100m Sprint (Fastest 100m Sprinter in College) \n• 1st Position – Volleyball Intercollege Champions \n• 1st Position – Football Intercollege Champions  ",
+      "images": ["images/sports-1.jpg", "images/sports-2.jpg"]
+    },
+    {
+      "category": "CSR",
+      "title": "Community Awareness Through Nukkad Nataks",
+      "role": "Participant & Coordination",
+      "when": "2025 & 2026",
+      "text": "• 2025 – Government Schemes Awareness: Organized a street play in a slum community to educate residents about various government welfare schemes, their benefits, and eligibility. \n• 2026 – Blood Donation Awareness: Conducted a street play at a hospital to spread awareness about the importance of voluntary blood donation and its life-saving impact.",
+      "images": ["images/csr-1.jpg"]
+    },
+    {
+      "category": "Event management",
+      "title": "Event Management & Coordination",
+      "role": "Event Coordinator",
+      "when": "2024-2026",
+      "text": "• AI Summit (2025) – Contributed to organizing a technical summit focused on Artificial Intelligence.\n• Orientation (2025) – Coordinated activities and event execution for incoming students.\n• Internal Hackathon (2025) – Organized and coordinated the university-level technical hackathon.\n• Sports Day (2025 & 2026) – Organized and coordinated university sports events and activities. \n• Nukkad Natak (2025 & 2026) – Organized street-play initiatives promoting social awareness and community engagement.",
+      "images": ["images/event-1.jpg", "images/event-2.jpg"]
+    }
+  ]
+}
