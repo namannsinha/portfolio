@@ -1,12 +1,12 @@
 {
-  "updated": "2026-11-13T10:43:19Z",
+  "updated": "2026-11-14T09:57:14Z",
   "rating": 1590,
   "topPercentage": 25.9,
   "contests": 14,
   "solved": {
-    "all": 288,
+    "all": 289,
     "easy": 183,
-    "medium": 100,
+    "medium": 101,
     "hard": 5
   }
 }
